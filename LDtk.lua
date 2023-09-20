@@ -57,17 +57,21 @@ local _imageTables = {}
 local _use_external_files = false
 local _use_lua_levels = false
 
+local _override_transparent_tile_index = nil
+
 local _ = {} -- for private functions
 
 -- @use_lua_levels(optional)
 --	true: will load lua precomputed levels
 --	false: will load .ldtk files (slower)
 --	nil: will load lua files if they exist
-function LDtk.load( ldtk_file, use_lua_levels )
+function LDtk.load( ldtk_file, use_lua_levels, override_transparent_tile_index )
 	_ldtk_filepath = ldtk_file
 	_ldtk_folder, _ldtk_filename = _.get_folder_and_filename( ldtk_file )
 	_ldtk_folder_table = _.get_folder_table( _ldtk_folder )
 	_ldtk_lua_folder = _ldtk_folder.._ldtk_lua_foldername
+
+	_override_transparent_tile_index = override_transparent_tile_index
 
 	local lua_filename = _ldtk_lua_folder.."/".._ldtk_filename..".pdz"
 
@@ -297,7 +301,14 @@ function LDtk.load_level( level_name )
 		-- handle tiles
 		local tiles_data = layer_data.gridTiles
 		if #layer_data.autoLayerTiles>0 then
-			tiles_data = layer_data.autoLayerTiles
+			local autoLayerTilesWithTransparencyOverriden = {}
+			for _, v in pairs(layer_data.autoLayerTiles) do
+				if v['t'] == _override_transparent_tile_index then
+					v['t'] = -1
+				end
+				table.insert(autoLayerTilesWithTransparencyOverriden, v)
+			end
+			tiles_data = autoLayerTilesWithTransparencyOverriden
 		end
 		if #tiles_data>0 then
 			layer.tilemap_width = layer_data.__cWid
