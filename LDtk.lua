@@ -65,6 +65,10 @@ local _ = {} -- for private functions
 --	true: will load lua precomputed levels
 --	false: will load .ldtk files (slower)
 --	nil: will load lua files if they exist
+-- @override_transparent_tile_index(optional)
+-- The provided tile id will be replaced by an invalid id of -1, and thus treated as transparent.
+-- This is a workaround for a bug with transparent sprites in tilemaps.
+-- See: https://devforum.play.date/t/using-transparent-images-as-tiles-on-tilemap-lead-to-smearing-effect/9851/5
 function LDtk.load( ldtk_file, use_lua_levels, override_transparent_tile_index )
 	_ldtk_filepath = ldtk_file
 	_ldtk_folder, _ldtk_filename = _.get_folder_and_filename( ldtk_file )
